@@ -32,6 +32,7 @@ pub(crate) struct Header {
 #[derive(Debug)]
 pub(crate) struct Interface {
     pub(crate) name: String,
+    pub(crate) ip: String,
 }
 
 #[derive(Debug)]

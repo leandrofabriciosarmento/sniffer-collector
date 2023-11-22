@@ -61,13 +61,20 @@ fn sniffer_network_interface(main_device: Device) {
 
     // Verifica o IP da interface de rede
     let mut ip_addres: String = String::new();
-    for (name, ip) in network_interfaces.iter() {
-        if name.to_string() == main_device.name.to_string()
-            && Regex::new(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}").unwrap().is_match(&*ip.to_string()) {
-            ip_addres = ip.to_string();
-            println!("Listenner: {:?}, {:?}", main_device, ip);
+    for add in main_device.clone().addresses {
+        if /*(name.to_string() == main_device.name.to_string()
+            && Regex::new(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}").unwrap().is_match(&*ip.to_string()) )
+            || */add.addr.to_string() == CONFIG.server.interface.ip.to_string() {
+            ip_addres = add.addr.to_string();
+            println!("Listenner: {:?}", main_device);
             break;
         }
+    }
+
+    // se ip_addres for vazio, percorre a lista de ip de main_device e compara
+    // com o ip do arquivo de configuração
+    if ip_addres.is_empty() {
+         return;
     }
 
 

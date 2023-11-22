@@ -39,6 +39,7 @@ pub(crate) fn read_properties_file(filename: &str) -> Result<Config, std::io::Er
         environment:  properties.get("server.environment").unwrap_or(&"".to_string()).to_string(),
         interface: Interface {
             name: properties.get("server.interface.name").unwrap_or(&"".to_string()).to_string(),
+            ip: properties.get("server.interface.ip").unwrap_or(&"".to_string()).to_string(),
         },
         outputfolder: properties.get("server.outputfolder").unwrap_or(&"".to_string()).to_string(),
     };
