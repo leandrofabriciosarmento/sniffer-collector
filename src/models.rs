@@ -3,13 +3,15 @@ use crate::CONFIG;
 
 #[derive(Debug)]
 pub struct Config {
+    pub(crate) component_name: String,
     pub(crate) server: ServerConfig,
     pub(crate) sniffer: SnifferConfig,
 }
 
 #[derive(Debug)]
 pub(crate) struct ServerConfig {
-    pub(crate) name: String,
+    pub(crate) host_http: String,
+    pub(crate) environment: String,
     pub(crate) interface: Interface,
     pub(crate) outputfolder: String,
 }
@@ -54,11 +56,12 @@ pub struct IPv4Packet {
     pub(crate) destination_port: u16,
     pub(crate) http_resource: String,
     pub(crate) time: SystemTime,
-    pub(crate) server_name: String,
     pub(crate) server_ip: String,
     pub(crate) direction: String,
     pub(crate) linkedkey: String,
-    pub(crate) hostname: String,
+    pub(crate) component_name: String,
+    pub(crate) environment: String,
+    pub(crate) host_http: String
 }
 
 impl EthernetFrame {
@@ -198,7 +201,6 @@ impl IPv4Packet {
         let source_ip = format!("{}.{}.{}.{}", packet[12], packet[13], packet[14], packet[15]);
         let destination_ip = format!("{}.{}.{}.{}", packet[16], packet[17], packet[18], packet[19]);
         let now = SystemTime::now();
-        let servver_name = String::new();
         let servver_ip = String::new();
 
         let payload = &packet[header_length as usize..];
@@ -264,11 +266,12 @@ impl IPv4Packet {
                         destination_port,
                         http_resource: txt_resource.to_string(),
                         time: now,
-                        server_name: servver_name,
                         server_ip: servver_ip,
                         direction: "".to_string(),
                         linkedkey: linkedkey.to_string(),
-                        hostname: "".to_string(),
+                        component_name: CONFIG.component_name.to_string(),
+                        environment: CONFIG.server.environment.to_string(),
+                        host_http: CONFIG.server.host_http.to_string(),
                     })
                 } else {
                     // Não é tráfego HTTP que intresse

@@ -1,7 +1,6 @@
 mod file_utils;
 mod models;
 
-use hostname::get as get_hostname;
 use std::fs::File;
 use std::io::{BufWriter, Write};
 use std::path::Path;
@@ -102,10 +101,11 @@ fn percorrer_pacotes(mut ip_addres: &mut String, cap: &mut Capture<Active>) {
             };
 
             // Texto formatado para o arquivo de log
-            let formatted_text = format!("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n",
+            let formatted_text = format!("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n",
+                                         ipv4_packet.environment,
+                                         ipv4_packet.component_name,
+                                         ipv4_packet.host_http,
                                          ipv4_packet.direction,
-                                         ipv4_packet.server_name,
-                                         ipv4_packet.hostname,
                                          ipv4_packet.source_ip,
                                          ipv4_packet.destination_ip,
                                          ipv4_packet.http_resource,
@@ -126,24 +126,16 @@ fn percorrer_pacotes(mut ip_addres: &mut String, cap: &mut Capture<Active>) {
 
 // Adiciona informações extras ao pacote
 fn adicionar_informacoes_extras(ip_addres: &mut String, ipv4_packet: &mut IPv4Packet) {
-    ipv4_packet.server_name = CONFIG.server.name.to_string();
     ipv4_packet.server_ip = ip_addres.to_string();
-
     // Define se o pacote é de entrada ou saída
     ipv4_packet.direction = if ip_addres.to_string() == ipv4_packet.source_ip.to_string() { "OUT" } else { "IN" }.to_string();
-
-    // Define o nome do host servidor
-    ipv4_packet.hostname = match get_hostname() {
-        Ok(hostname) => hostname.to_string_lossy().to_string(),
-        Err(_e) => "NOT_FOUND".to_string()
-    };
 }
 
 fn create_new_file_log() -> std::io::Result<BufWriter<File>> {
     let timestamp = Utc::now().format("%Y%m%d%H%M%S").to_string();
     let file_name = format!("{}output_{}_{}.lws",
                             &*CONFIG.server.outputfolder.to_string(),
-                            &*CONFIG.server.name,
+                            &*CONFIG.component_name.to_string(),
                             timestamp);
     let file = File::create(Path::new(&file_name))?;
     println!("Arquivo {} criado!\n", file_name);
@@ -163,13 +155,13 @@ fn verbose(ipv4_packet: &IPv4Packet) {
     println!("Source IP: {}", ipv4_packet.source_ip);
     println!("Destination IP: {}", ipv4_packet.destination_ip);
 
-    println!("Hostname: {}", ipv4_packet.hostname);
+    println!("Componente: {}", ipv4_packet.component_name);
+    println!("ServerName: {}", ipv4_packet.host_http);
     println!("Source Port: {}", ipv4_packet.source_port);
     println!("Destination Port: {}", ipv4_packet.destination_port);
     println!("Header: {}", ipv4_packet.http_resource);
     println!("LinkedKey: {}", ipv4_packet.linkedkey);
     println!("Direction: {}", ipv4_packet.direction);
-    println!("ServerName: {}", ipv4_packet.server_name);
     println!("Server IP: {}", ipv4_packet.server_ip);
 
     println!("--------------------------------------------------------------------------\n\n");

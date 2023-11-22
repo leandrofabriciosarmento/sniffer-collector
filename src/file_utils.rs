@@ -35,7 +35,8 @@ pub(crate) fn read_properties_file(filename: &str) -> Result<Config, std::io::Er
     }
 
     let server = ServerConfig {
-        name: properties.get("server.name").unwrap_or(&"".to_string()).to_string(),
+        host_http: properties.get("server.host_http").unwrap_or(&"".to_string()).to_string(),
+        environment:  properties.get("server.environment").unwrap_or(&"".to_string()).to_string(),
         interface: Interface {
             name: properties.get("server.interface.name").unwrap_or(&"".to_string()).to_string(),
         },
@@ -60,5 +61,7 @@ pub(crate) fn read_properties_file(filename: &str) -> Result<Config, std::io::Er
 
     };
 
-    Ok(Config { server, sniffer })
+    let component_name = properties.get("component_name").unwrap_or(&"".to_string()).to_string();
+
+    Ok(Config { component_name, server, sniffer })
 }
